@@ -16,6 +16,7 @@ contract GouvernementsManager {
         string _lieuNaissance; //Lieu de naissance du profile
         string _nationalite; //Nationalité du profile
         string _couleurYeux; //Couleur des yeux du profile
+        address _profileAddress; //Adresse du profile
     }
 
     //Représente un Gouvernement
@@ -61,7 +62,8 @@ contract GouvernementsManager {
         uint256 _dateNaissance,
         string memory _lieuNaissance,
         string memory _nationalite,
-        string memory _couleurYeux
+        string memory _couleurYeux,
+        address _profileAddress
     ) external onlyOwner {
         //Check si le Gouvernement existe si oui créer une variable de type Structure Profile et lui affecte pour valeur
         //Le nom du profile et les autres données passées en paramètre
@@ -76,7 +78,8 @@ contract GouvernementsManager {
             _dateNaissance,
             _lieuNaissance,
             _nationalite,
-            _couleurYeux
+            _couleurYeux,
+            _profileAddress
         );
         //Envoi dans le tableau Profiles du Gouvernement la structure thisProfile
         Gouvernements[_GouvernementAdress]._Profiles.push(thisProfile);
@@ -92,5 +95,49 @@ contract GouvernementsManager {
         );
         // Récupère le tableau représentatn la compilation pour le front end
         emit getTheProfiles(Gouvernements[_GouvernementAdress]._Profiles);
+    }
+
+    //fonction qui retourne le profile d'un utilisateur dans un Gouvernement sans utiliser de profile memory
+    function getProfileData(
+        address _GouvernementAdress,
+        address _profileAddress
+    )
+        external
+        view
+        returns (
+            //Retourne les données du profile
+            string memory,
+            string memory,
+            uint256,
+            uint256,
+            string memory,
+            string memory,
+            string memory
+        )
+    {
+        require(
+            //Check si le Gouvernement existe
+            bytes(Gouvernements[_GouvernementAdress]._name).length > 0,
+            "Ce Gouvernement n'existe pas"
+        );
+        //Récupère le tableau représentant les profiles du Gouvernement
+        Profile[] memory profiles = Gouvernements[_GouvernementAdress]
+            ._Profiles;
+        //Parcours le tableau
+        for (uint256 i = 0; i < profiles.length; i++) {
+            //Si l'adresse du profile correspond à l'adresse du profile passé en paramètre
+            if (profiles[i]._profileAddress == _profileAddress) {
+                //Retourne les données du profile
+                return (
+                    profiles[i]._nom,
+                    profiles[i]._prenom,
+                    profiles[i]._taille,
+                    profiles[i]._dateNaissance,
+                    profiles[i]._lieuNaissance,
+                    profiles[i]._nationalite,
+                    profiles[i]._couleurYeux
+                );
+            }
+        }
     }
 }

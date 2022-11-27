@@ -32,20 +32,31 @@ contract("./GouvernementsManager", accounts => {
 
   it('Devrais ajouter un Profile', async () => {
     const Contract = await GouvernementsManager.deployed();
-
+    /* const _profileAddress = web3.utils.randomHex(20); */
+    // on créer une adress manuellement pour tester
+    const _profileAddress2 = '0x6e023a727d7ba7edfc6e63cce8f71c37c760451b';
+    // on va utiliser le profileAddress2 pour le test
     const result = await Contract.addProfile('0x6e023a727d7ba7edfc6e63cce8f71c37c7604512',
-      'Benzemma', 'Karim', 182, 972484694, 'Paris', 'Française', 'Marron', { from: accounts[0] });
-    // on ajoute un deuxieme profile pour le meme gouvernement
-    /*     const result2 = await Contract.addProfile('0x6e023a727d7ba7edfc6e63cce8f71c37c7604512',
-          'Griezmann', 'Antoine', 176, 972468694, 'Nice', 'Française', 'Noir', { from: accounts[0] });
-        assert.equal(result.logs[0].args._nom, 'Benzemma', "Not equals to Benzemma"); */
+      'Benzemma', 'Karim', 182, 972484694, 'Paris', 'Française', 'Marron', _profileAddress2, { from: accounts[0] });
   })
+
+  // on rajoute un deuxieme profile pour le meme gouvernement
+  it('Devrais ajouter un deuxieme Profile', async () => {
+    const Contract = await GouvernementsManager.deployed();
+    const _profileAddress = '0x6e023a727d7ba7edfc6e63cce8f71c37c760451c';
+    const result2 = await Contract.addProfile('0x6e023a727d7ba7edfc6e63cce8f71c37c7604512',
+      'Griezmann', 'Antoine', 176, 972468694, 'Nice', 'Française', 'Noir', _profileAddress, { from: accounts[0] });
+  })
+
+
 
   it('Devrais ne pas ajouter un Profile a un gouvernement inconnu ', async () => {
     let err = null;
     try {
       //Passe une addresse ne correspodant pas à un gouvernement
-      await Contract.addProfile('0x24abae56e491dc290e43282cc2076cc6faa1e41d', 'Macron', 'Emanuelle', 174, 972464694, 'Paris', 'Française', 'Marron', { from: accounts[0] });
+      // on va génére une addresse random pour le profile 
+      const randomAddress2 = web3.utils.randomHex(20);
+      await Contract.addProfile('0x24abae56e491dc290e43282cc2076cc6faa1e41d', 'Macron', 'Emanuelle', 174, 972464694, 'Paris', 'Française', 'Marron', randomAddress2, { from: accounts[0] });
     }
     catch (error) {
       err = error;
@@ -61,4 +72,13 @@ contract("./GouvernementsManager", accounts => {
     /* console.log(result.logs[0].args._Profiles); */
 
   })
+
+  // on retourne un profile en donnant l'adresse du profile '0x6e023a727d7ba7edfc6e63cce8f71c37c760451b' et l'adresse du gouvernement '0x6e023a727d7ba7edfc6e63cce8f71c37c7604512' cela devrais retourner le profile de Benzemma
+  it('Devrais retourner le profile de Benzemma en donnant son addresse', async () => {
+    const Contract = await GouvernementsManager.deployed();
+    const result = await Contract.getProfileData('0x6e023a727d7ba7edfc6e63cce8f71c37c7604512', '0x6e023a727d7ba7edfc6e63cce8f71c37c760451c');
+    // on retourne le résultat du profile de Benzemma
+    console.log(result);
+  })
+
 })
